@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>비동기 실행 순서 퀴즈</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>비동기 JavaScript 실행 순서 퀴즈</h1>
+    <p class="subtitle">코드잇 풀스택 13기 · 2026.04.21 멘토링</p>
+    <nav class="category-nav">
+      <button class="category-btn active" data-category="all">전체</button>
+      <button class="category-btn" data-category="warmup">워밍업</button>
+      <button class="category-btn" data-category="promise">Promise</button>
+      <button class="category-btn" data-category="async">async/await</button>
+      <button class="category-btn" data-category="compare">비교</button>
+    </nav>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+      <span class="progress-text" id="progressText">0 / 0 완료</span>
+    </div>
+  </header>
+
+  <main id="quizContainer"></main>
+
+  <footer>
+    <button class="reset-btn" id="resetBtn">전체 초기화</button>
+  </footer>
+
+  <button class="scroll-top-btn" id="scrollTopBtn" aria-label="맨 위로">↑</button>
+
+  <script src="quiz-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

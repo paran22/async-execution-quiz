@@ -159,11 +159,36 @@ async function executeCode(code) {
     error: (...args) => logs.push(args.map(formatVal).join(' ')),
   };
 
+  // 퀴즈 코드의 setTimeout을 세어서, 예약된 타이머가 모두 끝날 때까지 기다린다
+  let pendingTimers = 0;
+  let notifyDone;
+  const allDone = new Promise(resolve => { notifyDone = resolve; });
+
+  // 0ms 타이머로 확인해서, 그사이 마이크로태스크가 새로 예약한 타이머도 놓치지 않는다
+  const checkDone = () => {
+    setTimeout(() => {
+      if (pendingTimers === 0) notifyDone();
+    }, 0);
+  };
+
+  const trackedSetTimeout = (callback, delay, ...args) => {
+    pendingTimers++;
+    return setTimeout(() => {
+      try {
+        callback(...args);
+      } finally {
+        pendingTimers--;
+        checkDone();
+      }
+    }, delay);
+  };
+
   try {
-    const fn = new Function('console', code);
-    fn(mockConsole);
-    // 비동기 작업이 끝나도록 대기 (마이크로태스크 + setTimeout 0 처리)
-    await new Promise(resolve => setTimeout(resolve, 50));
+    const fn = new Function('console', 'setTimeout', code);
+    fn(mockConsole, trackedSetTimeout);
+    checkDone();
+    // 타이머가 끝나지 않는 코드라도 5초 뒤에는 결과를 보여준다
+    await Promise.race([allDone, new Promise(resolve => setTimeout(resolve, 5000))]);
     return { success: true, output: logs.join('\n') };
   } catch (err) {
     return { success: false, output: `${err.name}: ${err.message}` };
